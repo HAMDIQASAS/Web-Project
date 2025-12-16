@@ -69,6 +69,20 @@ function createOrder() {
             jsonResponse(['success' => false, 'message' => 'Cart is empty'], 400);
         }
 
+        // Validate stock availability
+        foreach ($cartItems as $item) {
+            $stockStmt = $pdo->prepare("SELECT stock_quantity FROM products WHERE id = ?");
+            $stockStmt->execute([$item['product_id']]);
+            $stock = $stockStmt->fetchColumn();
+
+            if ($stock < $item['quantity']) {
+                jsonResponse([
+                    'success' => false,
+                    'message' => "Insufficient stock for {$item['name']}. Only {$stock} available."
+                ], 400);
+            }
+        }
+
         // Calculate totals
         $subtotal = 0;
         foreach ($cartItems as $item) {
@@ -105,6 +119,12 @@ function createOrder() {
         $stmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
         foreach ($cartItems as $item) {
             $stmt->execute([$orderId, $item['product_id'], $item['quantity'], $item['price']]);
+        }
+
+        // Reduce stock for each product
+        $stockStmt = $pdo->prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?");
+        foreach ($cartItems as $item) {
+            $stockStmt->execute([$item['quantity'], $item['product_id']]);
         }
 
         // Clear cart

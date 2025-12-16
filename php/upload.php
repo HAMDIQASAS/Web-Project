@@ -41,7 +41,16 @@ $maxFileSize = 5 * 1024 * 1024; // 5MB
 
 // Create upload directory if it doesn't exist
 if (!file_exists($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
+    if (!mkdir($uploadDir, 0755, true)) {
+        echo json_encode(['success' => false, 'message' => 'Failed to create upload directory. Check server permissions.']);
+        exit;
+    }
+}
+
+// Check if directory is writable
+if (!is_writable($uploadDir)) {
+    echo json_encode(['success' => false, 'message' => 'Upload directory is not writable. Set permissions to 755 or 775 on: uploads/products/']);
+    exit;
 }
 
 // Check if file was uploaded

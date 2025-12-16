@@ -333,6 +333,7 @@ function createProductCard(product) {
     <article class="product-card" data-category="${product.category}">
       <a href="product.html?id=${product.id}" class="product-image">
         <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+        <span class="product-name-overlay">${product.name}</span>
         ${stock < 10 && stock > 0 ? '<span class="product-badge">Low Stock</span>' : ''}
         ${stock === 0 ? '<span class="product-badge sold-out">Sold Out</span>' : ''}
       </a>
