@@ -1,3 +1,7 @@
+/* ========================================
+   SWEETS STORE - NEON THEME
+   ======================================== */
+
 /* CSS Variables */
 :root {
     --bg: #000000;
@@ -725,12 +729,61 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 .quantity-selector {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0;
     margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: fit-content;
 }
 
 .quantity-selector label {
     font-weight: 600;
+}
+
+.quantity-selector > button {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    color: var(--text-light);
+    font-size: 1.25rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.quantity-selector > button:hover {
+    background: var(--magenta);
+    color: var(--text-light);
+}
+
+.quantity-selector > input {
+    width: 60px;
+    height: 44px;
+    text-align: center;
+    background: var(--bg-card);
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 600;
+    -moz-appearance: textfield;
+}
+
+.quantity-selector > input::-webkit-outer-spin-button,
+.quantity-selector > input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-selector > input:focus {
+    outline: none;
+    background: var(--bg-elevated);
 }
 
 .quantity-controls {
@@ -1236,6 +1289,25 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     margin-top: 1.5rem;
 }
 
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.summary-item span:last-child {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.summary-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 0;
+}
+
 .success-modal {
     position: fixed;
     inset: 0;
@@ -1533,4 +1605,68 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* ========================================
+   USER NAVIGATION
+   ======================================== */
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-greeting {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.user-nav .btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-success {
+    border-color: var(--cyan);
+}
+
+.toast-error {
+    border-color: var(--magenta);
+}
+
+.toast button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.toast button:hover {
+    color: var(--text-light);
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn about KOOKIE's story - Our passion for crafting premium handmade sweets and confections since 2025.">
+    <meta name="description" content="Learn about KOOKIE's story - Our passion for crafting premium handmade sweets and confections since 2010.">
     <title>About Us - KOOKIE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +25,7 @@
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
                 </ul>
+                <div id="user-nav" class="user-nav"></div>
                 <a href="cart.html" class="cart-btn" aria-label="View cart">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -50,14 +51,15 @@
     <a href="about.html" onclick="closeMobileNav()">About</a>
     <a href="contact.html" onclick="closeMobileNav()">Contact</a>
     <a href="cart.html" onclick="closeMobileNav()">Cart</a>
+    <a href="auth.html" onclick="closeMobileNav()" id="mobile-auth-link">Sign In</a>
 </nav>
 
 <main id="main">
     <!-- Hero -->
     <section class="about-hero" aria-labelledby="about-heading">
         <div class="container">
-            <h1 id="about-heading">KOOKIE's Story</h1>
-            <p>Crafting moments of pure sweetness since 2025. Every piece we make is a labor of love, designed to bring joy to your taste buds.</p>
+            <h1 id="about-heading">Our Story</h1>
+            <p>Crafting moments of pure sweetness since 2010. Every piece we make is a labor of love, designed to bring joy to your taste buds.</p>
         </div>
     </section>
 
@@ -72,7 +74,7 @@
                 </div>
                 <div class="about-text">
                     <h2>The Beginning</h2>
-                    <p>KOOKIE was born from a simple dream: to create palestinian made sweets that capture the magic of childhood wonder. Founded by Hamdi Qasas and Khaleel Qanabeeta in Nablus, we've grown from a local favorite to a beloved brand serving sweet-lovers worldwide.</p>
+                    <p>KOOKIE was born from a simple dream: to create confections that capture the magic of childhood wonder. Founded by master chocolatier Elena Martinez in her small Brooklyn kitchen, we've grown from a local favorite to a beloved brand serving sweet-lovers worldwide.</p>
                     <p>Every recipe we create honors the traditions passed down through generations, while embracing innovation that keeps our flavors exciting and fresh.</p>
                 </div>
             </div>
@@ -85,8 +87,8 @@
                 </div>
                 <div class="about-text">
                     <h2>Our Craft</h2>
-                    <p>We believe in quality over quantity. Each piece of sweets is handcrafted in small batches using only the finest ingredients sourced from trusted suppliers around the globe. From Belgian cocoa to Madagascan vanilla, we never compromise on what goes into our treats.</p>
-                    <p>Our team of skilled chefs and bakers bring decades of combined experience to every creation, ensuring that each bite delivers the perfect balance of flavor, texture, and sweetness.</p>
+                    <p>We believe in quality over quantity. Each piece of candy is handcrafted in small batches using only the finest ingredients sourced from trusted suppliers around the globe. From Belgian cocoa to Madagascan vanilla, we never compromise on what goes into our treats.</p>
+                    <p>Our team of skilled artisans brings decades of combined experience to every creation, ensuring that each bite delivers the perfect balance of flavor, texture, and sweetness.</p>
                 </div>
             </div>
 
@@ -98,7 +100,7 @@
                 </div>
                 <div class="about-text">
                     <h2>Our Promise</h2>
-                    <p>We're committed to sustainability and ethical sourcing. Our packaging is eco-friendly, and we work directly with ethical suppliers to ensure fair wages and sustainable practices. When you choose KOOKIE, you're not just treating yourself—you're supporting a better future for our planet.</p>
+                    <p>We're committed to sustainability and ethical sourcing. Our packaging is eco-friendly, and we work directly with cocoa farmers to ensure fair wages and sustainable practices. When you choose KOOKIE, you're not just treating yourself—you're supporting a better future for our planet.</p>
                     <p>Whether you're celebrating a special occasion or simply craving something sweet, we promise to deliver an experience that's as memorable as it is delicious.</p>
                 </div>
             </div>
@@ -110,19 +112,19 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <h3>1+</h3>
+                    <h3>14+</h3>
                     <p>Years of Excellence</p>
                 </div>
                 <div class="stat-item">
-                    <h3>2K+</h3>
+                    <h3>50K+</h3>
                     <p>Happy Customers</p>
                 </div>
                 <div class="stat-item">
                     <h3>100+</h3>
-                    <p>Unique Sweets</p>
+                    <p>Unique Flavors</p>
                 </div>
                 <div class="stat-item">
-                    <h3>3</h3>
+                    <h3>12</h3>
                     <p>Countries Served</p>
                 </div>
             </div>
@@ -136,25 +138,25 @@
         <div class="footer-inner">
             <div class="footer-logo">KOOKIE</div>
             <div class="social-links">
-                <a href="https://www.facebook.com/hamdi.qasas.5" class="social-link" aria-label="Facebook" target="_blank">
+                <a href="#" class="social-link" aria-label="Facebook">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                     </svg>
                 </a>
-                <a href="https://www.instagram.com/hamdi.2110/" class="social-link" aria-label="Instagram" target="_blank">
+                <a href="#" class="social-link" aria-label="Instagram">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                         <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                     </svg>
                 </a>
-                <a href="https://x.com/home" class="social-link" aria-label="Twitter" target="_blank">
+                <a href="#" class="social-link" aria-label="Twitter">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
                     </svg>
                 </a>
             </div>
-            <p class="footer-copy">© 2025 KOOKIE. All rights reserved.</p>
+            <p class="footer-copy">© 2024 KOOKIE. All rights reserved.</p>
         </div>
     </div>
 </footer>

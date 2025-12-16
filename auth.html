@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in or create an account at KOOKIE - Premium handcrafted sweets.">
+  <title>Sign In - KOOKIE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background:
+              radial-gradient(circle at 20% 50%, rgba(255, 0, 153, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 50%, rgba(0, 255, 214, 0.1) 0%, transparent 50%);
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 420px;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .auth-header .logo {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .auth-header p {
+      color: var(--text-muted);
+    }
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .auth-tab:hover {
+      color: var(--text-light);
+    }
+    .auth-tab.active {
+      color: var(--magenta);
+      border-bottom-color: var(--magenta);
+    }
+    .auth-form {
+      display: none;
+    }
+    .auth-form.active {
+      display: block;
+    }
+    .auth-error, .auth-success {
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .auth-error {
+      background: rgba(255, 0, 100, 0.1);
+      border: 1px solid var(--magenta);
+      color: var(--magenta);
+    }
+    .auth-success {
+      background: rgba(0, 255, 214, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .auth-error.show, .auth-success.show {
+      display: block;
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .auth-footer a {
+      color: var(--cyan);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<main class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <a href="home.html" class="logo">KOOKIE</a>
+      <p>Welcome back! Sign in to your account or create a new one.</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('signin')" id="signin-tab">Sign In</button>
+        <button class="auth-tab" onclick="switchTab('signup')" id="signup-tab">Sign Up</button>
+      </div>
+
+      <div id="auth-error" class="auth-error"></div>
+      <div id="auth-success" class="auth-success"></div>
+
+      <!-- Sign In Form -->
+      <form class="auth-form active" id="signin-form" onsubmit="handleSignIn(event)">
+        <div class="form-group">
+          <label for="signin-email">Email</label>
+          <input type="email" id="signin-email" name="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signin-password">Password</label>
+          <input type="password" id="signin-password" name="password" placeholder="••••••••" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form class="auth-form" id="signup-form" onsubmit="handleSignUp(event)">
+        <div class="form-group">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" name="name" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="password" placeholder="••••••••" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="signup-confirm">Confirm Password</label>
+          <input type="password" id="signup-confirm" name="confirm_password" placeholder="••••••••" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        <a href="home.html">← Back to Store</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Check if already logged in
+  if (document.cookie.includes('logged_in=true')) {
+    window.location.href = 'home.html';
+  }
+
+  function switchTab(tab) {
+    const signinTab = document.getElementById('signin-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+
+    // Hide messages
+    document.getElementById('auth-error').classList.remove('show');
+    document.getElementById('auth-success').classList.remove('show');
+
+    if (tab === 'signin') {
+      signinTab.classList.add('active');
+      signupTab.classList.remove('active');
+      signinForm.classList.add('active');
+      signupForm.classList.remove('active');
+    } else {
+      signinTab.classList.remove('active');
+      signupTab.classList.add('active');
+      signinForm.classList.remove('active');
+      signupForm.classList.add('active');
+    }
+  }
+
+  function showError(message) {
+    const errorEl = document.getElementById('auth-error');
+    errorEl.textContent = message;
+    errorEl.classList.add('show');
+    document.getElementById('auth-success').classList.remove('show');
+  }
+
+  function showSuccess(message) {
+    const successEl = document.getElementById('auth-success');
+    successEl.textContent = message;
+    successEl.classList.add('show');
+    document.getElementById('auth-error').classList.remove('show');
+  }
+
+  async function handleSignIn(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('signin-email').value;
+    const password = document.getElementById('signin-password').value;
+
+    try {
+      const response = await fetch('php/auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'include',
+        body: `action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Set cookie on client side as backup
+        document.cookie = 'logged_in=true; path=/; max-age=86400';
+        showSuccess('Login successful! Redirecting...');
+        setTimeout(() => window.location.href = 'home.html', 1000);
+      } else {
+        showError(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      showError('Connection error. Please try again.');
+    }
+  }
+
+  async function handleSignUp(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+
+    if (password !== confirm) {
+      showError('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      showError('Password must be at least 6 characters.');
+      return;
+    }
+
+    try {
+      const response = await fetch('php/auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'include',
+        body: `action=register&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccess('Account created! You can now sign in.');
+        setTimeout(() => switchTab('signin'), 1500);
+      } else {
+        showError(data.message || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      showError('Connection error. Please try again.');
+    }
+  }
+</script>
+</body>
+</html>

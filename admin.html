@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KOOKIE Admin Dashboard - Manage products, orders, and users.">
+  <title>Admin Dashboard - KOOKIE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .admin-sidebar {
+      width: 250px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .admin-sidebar .logo {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .admin-sidebar .admin-badge {
+      font-size: 0.7rem;
+      color: var(--magenta);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+    }
+    .admin-nav {
+      list-style: none;
+    }
+    .admin-nav li {
+      margin-bottom: 0.5rem;
+    }
+    .admin-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .admin-nav a:hover,
+    .admin-nav a.active {
+      background: rgba(255, 0, 153, 0.1);
+      color: var(--magenta);
+    }
+    .admin-nav svg {
+      width: 20px;
+      height: 20px;
+    }
+    .admin-main {
+      flex: 1;
+      margin-left: 250px;
+      padding: 2rem;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .admin-header h1 {
+      font-size: 1.5rem;
+    }
+    .admin-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .admin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .admin-card h3 {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .admin-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .admin-card.magenta .value { color: var(--magenta); }
+    .admin-card.cyan .value { color: var(--cyan); }
+    .admin-card.yellow .value { color: var(--yellow); }
+    .admin-section {
+      display: none;
+    }
+    .admin-section.active {
+      display: block;
+    }
+    .admin-table {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .admin-table th,
+    .admin-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table th {
+      background: var(--bg-elevated);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .admin-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .admin-actions button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-edit {
+      background: rgba(0, 255, 214, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .btn-edit:hover {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .btn-delete {
+      background: rgba(255, 0, 153, 0.1);
+      border: 1px solid var(--magenta);
+      color: var(--magenta);
+    }
+    .btn-delete:hover {
+      background: var(--magenta);
+      color: var(--text-light);
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-pending {
+      background: rgba(255, 213, 0, 0.2);
+      color: var(--yellow);
+    }
+    .status-processing {
+      background: rgba(0, 255, 214, 0.2);
+      color: var(--cyan);
+    }
+    .status-shipped {
+      background: rgba(100, 100, 255, 0.2);
+      color: #6464ff;
+    }
+    .status-delivered {
+      background: rgba(0, 255, 100, 0.2);
+      color: #00ff64;
+    }
+    .status-cancelled {
+      background: rgba(255, 0, 153, 0.2);
+      color: var(--magenta);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.open {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .modal-header h2 {
+      font-size: 1.25rem;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      color: var(--text-light);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 2rem;
+    }
+    .back-link:hover {
+      color: var(--cyan);
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+      }
+      .admin-main {
+        margin-left: 0;
+      }
+      .admin-layout {
+        flex-direction: column;
+      }
+      .admin-table {
+        font-size: 0.85rem;
+      }
+      .admin-table th,
+      .admin-table td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <a href="home.html" class="logo">KOOKIE</a>
+    <div class="admin-badge">Admin Panel</div>
+
+    <ul class="admin-nav">
+      <li>
+        <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="#products" onclick="showSection('products')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          Products
+        </a>
+      </li>
+      <li>
+        <a href="#orders" onclick="showSection('orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Orders
+        </a>
+      </li>
+      <li>
+        <a href="#users" onclick="showSection('users')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Users
+        </a>
+      </li>
+      <li>
+        <a href="#messages" onclick="showSection('messages')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Messages
+        </a>
+      </li>
+    </ul>
+
+    <a href="home.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Back to Store
+    </a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="admin-section active">
+      <div class="admin-header">
+        <h1>Dashboard</h1>
+        <span id="admin-user-info"></span>
+      </div>
+
+      <div class="admin-cards">
+        <div class="admin-card magenta">
+          <h3>Total Products</h3>
+          <div class="value" id="stat-products">0</div>
+        </div>
+        <div class="admin-card cyan">
+          <h3>Total Orders</h3>
+          <div class="value" id="stat-orders">0</div>
+        </div>
+        <div class="admin-card yellow">
+          <h3>Total Users</h3>
+          <div class="value" id="stat-users">0</div>
+        </div>
+        <div class="admin-card">
+          <h3>Revenue</h3>
+          <div class="value" id="stat-revenue">$0</div>
+        </div>
+      </div>
+
+      <h2 style="margin-bottom: 1rem;">Recent Orders</h2>
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+        </thead>
+        <tbody id="recent-orders">
+        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="admin-section">
+      <div class="admin-header">
+        <h1>Products</h1>
+        <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="products-table">
+        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Orders Section -->
+    <section id="orders" class="admin-section">
+      <div class="admin-header">
+        <h1>Orders</h1>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="orders-table">
+        <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Users Section -->
+    <section id="users" class="admin-section">
+      <div class="admin-header">
+        <h1>Users</h1>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="users-table">
+        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Messages Section -->
+    <section id="messages" class="admin-section">
+      <div class="admin-header">
+        <h1>Contact Messages</h1>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="messages-table">
+        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<!-- Product Modal -->
+<div class="modal" id="product-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="product-modal-title">Add Product</h2>
+      <button class="modal-close" onclick="closeProductModal()">&times;</button>
+    </div>
+    <form id="product-form" onsubmit="saveProduct(event)">
+      <input type="hidden" id="product-id">
+      <div class="form-group">
+        <label for="product-name">Product Name</label>
+        <input type="text" id="product-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="product-category">Category</label>
+        <select id="product-category" name="category" required>
+          <option value="Chocolates">Chocolates</option>
+          <option value="Gummies">Gummies</option>
+          <option value="Candy Bars">Candy Bars</option>
+          <option value="Sugar-Free">Sugar-Free</option>
+          <option value="Cookies">Cookies</option>
+          <option value="Brownies">Brownies</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="product-price">Price ($)</label>
+        <input type="number" id="product-price" name="price" step="0.01" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="product-stock">Stock Quantity</label>
+        <input type="number" id="product-stock" name="stock" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="product-description">Description</label>
+        <textarea id="product-description" name="description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Product Image</label>
+        <div class="image-upload-container" style="margin-top: 0.5rem;">
+          <div id="image-preview" style="display: none; margin-bottom: 1rem; text-align: center;">
+            <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: var(--radius); border: 1px solid var(--border);">
+            <button type="button" onclick="clearImagePreview()" style="display: block; margin: 0.5rem auto; background: none; border: none; color: var(--magenta); cursor: pointer; font-size: 0.85rem;">Remove</button>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <label class="btn btn-outline btn-small" style="cursor: pointer;">
+              <input type="file" id="product-image-file" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleImageUpload(this)">
+              📷 Upload Image
+            </label>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">or</span>
+            <input type="url" id="product-image" name="image_url" placeholder="Paste image URL..." style="flex: 1; min-width: 150px;">
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Max 5MB. Formats: JPG, PNG, GIF, WebP</p>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Save Product</button>
+    </form>
+  </div>
+</div>
+
+<!-- Order Status Modal -->
+<div class="modal" id="order-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Update Order Status</h2>
+      <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+    </div>
+    <form id="order-form" onsubmit="updateOrderStatus(event)">
+      <input type="hidden" id="order-id">
+      <div class="form-group">
+        <label for="order-status">Status</label>
+        <select id="order-status" name="status" required>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Update Status</button>
+    </form>
+  </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal" id="message-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Message Details</h2>
+      <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+    </div>
+    <div id="message-details"></div>
+  </div>
+</div>
+
+<script>
+  // Check admin authentication
+  async function checkAdminAuth() {
+    try {
+      const response = await fetch('php/admin.php?action=check_admin', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.is_admin) {
+        alert('Access denied. Admin privileges required.');
+        window.location.href = 'home.html';
+        return false;
+      }
+
+      document.getElementById('admin-user-info').textContent = `Welcome, ${data.user.name}`;
+      return true;
+    } catch (error) {
+      console.error('Auth check error:', error);
+      window.location.href = 'auth.html';
+      return false;
+    }
+  }
+
+  // Show section
+  function showSection(section) {
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
+
+    document.getElementById(section).classList.add('active');
+    document.querySelector(`.admin-nav a[href="#${section}"]`).classList.add('active');
+
+    // Load section data
+    switch(section) {
+      case 'dashboard': loadDashboard(); break;
+      case 'products': loadProducts(); break;
+      case 'orders': loadOrders(); break;
+      case 'users': loadUsers(); break;
+      case 'messages': loadMessages(); break;
+    }
+  }
+
+  // Load dashboard stats
+  async function loadDashboard() {
+    try {
+      const response = await fetch('php/admin.php?action=dashboard', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        document.getElementById('stat-products').textContent = data.stats.products;
+        document.getElementById('stat-orders').textContent = data.stats.orders;
+        document.getElementById('stat-users').textContent = data.stats.users;
+        document.getElementById('stat-revenue').textContent = '$' + parseFloat(data.stats.revenue).toFixed(2);
+
+        // Recent orders
+        const tbody = document.getElementById('recent-orders');
+        if (data.recent_orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No orders yet</td></tr>';
+        } else {
+          tbody.innerHTML = data.recent_orders.map(order => `
+              <tr>
+                <td>#${order.id}</td>
+                <td>${order.user_name || 'Guest'}</td>
+                <td>$${parseFloat(order.total_amount).toFixed(2)}</td>
+                <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                <td>${new Date(order.created_at).toLocaleDateString('en-GB')}</td>
+              </tr>
+            `).join('');
+        }
+      }
+    } catch (error) {
+      console.error('Dashboard error:', error);
+    }
+  }
+
+  // Load products
+  async function loadProducts() {
+    try {
+      const response = await fetch('php/admin.php?action=products', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      const tbody = document.getElementById('products-table');
+      if (!data.success || data.products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No products found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.products.map(p => `
+          <tr>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.category}</td>
+            <td>$${parseFloat(p.price).toFixed(2)}</td>
+            <td>${p.stock_quantity}</td>
+            <td class="admin-actions">
+              <button class="btn-edit" onclick="editProduct(${p.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+    } catch (error) {
+      console.error('Products error:', error);
+    }
+  }
+
+  // Load orders
+  async function loadOrders() {
+    try {
+      const response = await fetch('php/admin.php?action=orders', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      const tbody = document.getElementById('orders-table');
+      if (!data.success || data.orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No orders found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.orders.map(o => `
+          <tr>
+            <td>#${o.id}</td>
+            <td>${o.user_name || 'Guest'}</td>
+            <td>${o.item_count} items</td>
+            <td>$${parseFloat(o.total_amount).toFixed(2)}</td>
+            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+            <td>${new Date(o.created_at).toLocaleDateString('en-GB')}</td>
+            <td class="admin-actions">
+              <button class="btn-edit" onclick="openOrderModal(${o.id}, '${o.status}')">Update</button>
+            </td>
+          </tr>
+        `).join('');
+    } catch (error) {
+      console.error('Orders error:', error);
+    }
+  }
+
+  // Load users
+  async function loadUsers() {
+    try {
+      const response = await fetch('php/admin.php?action=users', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      const tbody = document.getElementById('users-table');
+      if (!data.success || data.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No users found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.users.map(u => `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td><span class="status-badge ${u.role === 'admin' ? 'status-processing' : 'status-pending'}">${u.role}</span></td>
+            <td>${new Date(u.created_at).toLocaleDateString('en-GB')}</td>
+            <td class="admin-actions">
+              ${u.role !== 'admin' ? `<button class="btn-edit" onclick="toggleUserRole(${u.id}, 'admin')">Make Admin</button>` : ''}
+              ${u.role === 'admin' ? `<button class="btn-delete" onclick="toggleUserRole(${u.id}, 'user')">Remove Admin</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+    } catch (error) {
+      console.error('Users error:', error);
+    }
+  }
+
+  // Load messages
+  async function loadMessages() {
+    try {
+      const response = await fetch('php/admin.php?action=messages', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      const tbody = document.getElementById('messages-table');
+      if (!data.success || data.messages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No messages found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.messages.map(m => `
+          <tr>
+            <td>${m.id}</td>
+            <td>${m.name}</td>
+            <td>${m.email}</td>
+            <td>${new Date(m.created_at).toLocaleDateString('en-GB')}</td>
+            <td class="admin-actions">
+              <button class="btn-edit" onclick="viewMessage(${m.id}, '${encodeURIComponent(m.name)}', '${encodeURIComponent(m.email)}', '${encodeURIComponent(m.message)}')">View</button>
+              <button class="btn-delete" onclick="deleteMessage(${m.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+    } catch (error) {
+      console.error('Messages error:', error);
+    }
+  }
+
+  // Product modal functions
+  let uploadedImageUrl = null;
+
+  function openProductModal(product = null) {
+    document.getElementById('product-modal').classList.add('open');
+    document.getElementById('product-modal-title').textContent = product ? 'Edit Product' : 'Add Product';
+    document.getElementById('product-form').reset();
+    document.getElementById('product-id').value = product ? product.id : '';
+    uploadedImageUrl = null;
+
+    // Reset image preview
+    clearImagePreview();
+
+    if (product) {
+      document.getElementById('product-name').value = product.name;
+      document.getElementById('product-category').value = product.category;
+      document.getElementById('product-price').value = product.price;
+      document.getElementById('product-stock').value = product.stock_quantity;
+      document.getElementById('product-description').value = product.description || '';
+      document.getElementById('product-image').value = product.image_url || '';
+
+      // Show existing image preview
+      if (product.image_url) {
+        showImagePreview(product.image_url);
+      }
+    }
+  }
+
+  function closeProductModal() {
+    document.getElementById('product-modal').classList.remove('open');
+    uploadedImageUrl = null;
+  }
+
+  function showImagePreview(url) {
+    const preview = document.getElementById('image-preview');
+    const img = document.getElementById('preview-img');
+    img.src = url;
+    preview.style.display = 'block';
+  }
+
+  function clearImagePreview() {
+    const preview = document.getElementById('image-preview');
+    const img = document.getElementById('preview-img');
+    const fileInput = document.getElementById('product-image-file');
+    const urlInput = document.getElementById('product-image');
+
+    preview.style.display = 'none';
+    img.src = '';
+    fileInput.value = '';
+    urlInput.value = '';
+    uploadedImageUrl = null;
+  }
+
+  async function handleImageUpload(input) {
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File too large. Maximum size is 5MB.');
+      input.value = '';
+      return;
+    }
+
+    // Show loading state
+    const uploadBtn = input.parentElement;
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.innerHTML = '<input type="file" id="product-image-file" style="display: none;"> ⏳ Uploading...';
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('php/upload.php', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        uploadedImageUrl = data.image_url;
+        document.getElementById('product-image').value = data.image_url;
+        showImagePreview(data.image_url);
+      } else {
+        alert(data.message || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image');
+    } finally {
+      uploadBtn.innerHTML = originalText;
+      // Re-attach event listener
+      document.getElementById('product-image-file').onchange = function() { handleImageUpload(this); };
+    }
+  }
+
+  async function editProduct(id) {
+    try {
+      const response = await fetch(`php/admin.php?action=get_product&id=${id}`, {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.success) {
+        openProductModal(data.product);
+      }
+    } catch (error) {
+      console.error('Edit product error:', error);
+    }
+  }
+
+  async function saveProduct(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('product-id').value;
+    const imageUrl = uploadedImageUrl || document.getElementById('product-image').value;
+
+    const productData = {
+      name: document.getElementById('product-name').value,
+      category: document.getElementById('product-category').value,
+      price: document.getElementById('product-price').value,
+      stock_quantity: document.getElementById('product-stock').value,
+      description: document.getElementById('product-description').value,
+      image_url: imageUrl
+    };
+
+    try {
+      const response = await fetch(`php/admin.php?action=${id ? 'update_product' : 'add_product'}${id ? '&id=' + id : ''}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(productData)
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        closeProductModal();
+        loadProducts();
+        loadDashboard();
+      } else {
+        alert(data.message || 'Failed to save product');
+      }
+    } catch (error) {
+      console.error('Save product error:', error);
+      alert('Failed to save product');
+    }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+
+    try {
+      const response = await fetch(`php/admin.php?action=delete_product&id=${id}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        loadProducts();
+        loadDashboard();
+      } else {
+        alert(data.message || 'Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Delete product error:', error);
+    }
+  }
+
+  // Order modal functions
+  function openOrderModal(id, status) {
+    document.getElementById('order-modal').classList.add('open');
+    document.getElementById('order-id').value = id;
+    document.getElementById('order-status').value = status;
+  }
+
+  function closeOrderModal() {
+    document.getElementById('order-modal').classList.remove('open');
+  }
+
+  async function updateOrderStatus(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('order-id').value;
+    const status = document.getElementById('order-status').value;
+
+    try {
+      const response = await fetch(`php/admin.php?action=update_order&id=${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        closeOrderModal();
+        loadOrders();
+        loadDashboard();
+      } else {
+        alert(data.message || 'Failed to update order');
+      }
+    } catch (error) {
+      console.error('Update order error:', error);
+    }
+  }
+
+  // User role toggle
+  async function toggleUserRole(userId, newRole) {
+    if (!confirm(`Are you sure you want to ${newRole === 'admin' ? 'grant admin privileges to' : 'remove admin privileges from'} this user?`)) return;
+
+    try {
+      const response = await fetch(`php/admin.php?action=update_role&id=${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role: newRole })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        loadUsers();
+      } else {
+        alert(data.message || 'Failed to update user role');
+      }
+    } catch (error) {
+      console.error('Update role error:', error);
+    }
+  }
+
+  // Message modal functions
+  function viewMessage(id, name, email, message) {
+    document.getElementById('message-modal').classList.add('open');
+    document.getElementById('message-details').innerHTML = `
+        <p><strong>From:</strong> ${decodeURIComponent(name)}</p>
+        <p><strong>Email:</strong> ${decodeURIComponent(email)}</p>
+        <hr style="border-color: var(--border); margin: 1rem 0;">
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-wrap;">${decodeURIComponent(message)}</p>
+      `;
+  }
+
+  function closeMessageModal() {
+    document.getElementById('message-modal').classList.remove('open');
+  }
+
+  async function deleteMessage(id) {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+
+    try {
+      const response = await fetch(`php/admin.php?action=delete_message&id=${id}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        loadMessages();
+      } else {
+        alert(data.message || 'Failed to delete message');
+      }
+    } catch (error) {
+      console.error('Delete message error:', error);
+    }
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', async () => {
+    const isAdmin = await checkAdminAuth();
+    if (isAdmin) {
+      loadDashboard();
+    }
+  });
+</script>
+</body>
+</html>
