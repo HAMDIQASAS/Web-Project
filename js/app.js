@@ -185,11 +185,12 @@ const PRODUCTS = {
     items: [],
 
     // Fetch all products
-    getAll: async function(category = '', search = '') {
+    getAll: async function(category = '', search = '', sort = 'name') {
         try {
             let url = 'php/products.php?action=list';
             if (category) url += '&category=' + encodeURIComponent(category);
             if (search) url += '&search=' + encodeURIComponent(search);
+            if (sort) url += '&sort=' + encodeURIComponent(sort);
 
             const response = await fetch(url);
             const data = await response.json();
@@ -264,8 +265,8 @@ function toggleMobileNav() {
     const nav = document.getElementById('mobile-nav');
     const btn = document.querySelector('.mobile-menu-btn');
     if (nav && btn) {
-        nav.classList.toggle('open');
-        btn.setAttribute('aria-expanded', nav.classList.contains('open'));
+        nav.classList.toggle('show');
+        btn.setAttribute('aria-expanded', nav.classList.contains('show'));
     }
 }
 
@@ -273,7 +274,7 @@ function closeMobileNav() {
     const nav = document.getElementById('mobile-nav');
     const btn = document.querySelector('.mobile-menu-btn');
     if (nav && btn) {
-        nav.classList.remove('open');
+        nav.classList.remove('show');
         btn.setAttribute('aria-expanded', 'false');
     }
 }
@@ -361,22 +362,47 @@ async function initShopPage() {
     const grid = document.getElementById('products-grid');
     const searchInput = document.getElementById('search-input');
     const filterBtns = document.querySelectorAll('.filter-btn');
+    const sortSelect = document.getElementById('sort-select');
 
     if (!grid) return;
 
     let currentCategory = '';
     let searchTerm = '';
+    let currentSort = sortSelect ? sortSelect.value : 'name';
+    let lastLoadId = 0;
 
     async function loadProducts() {
+        const loadId = ++lastLoadId;
+        const selectedSort = sortSelect ? sortSelect.value : currentSort;
+        currentSort = selectedSort;
+
         grid.innerHTML = '<div class="loading">Loading products...</div>';
-        const products = await PRODUCTS.getAll(currentCategory, searchTerm);
+        const products = await PRODUCTS.getAll(currentCategory, searchTerm, selectedSort);
+
+        // Ignore stale responses (e.g. user changed sort/search quickly)
+        if (loadId !== lastLoadId) return;
 
         if (products.length === 0) {
             grid.innerHTML = '<div class="no-results">No products found</div>';
             return;
         }
 
-        grid.innerHTML = products.map(createProductCard).join('');
+        // Client-side sort (ensures correct ordering even if backend ignores sort)
+        const displayProducts = [...products];
+        switch (selectedSort) {
+            case 'price-asc':
+                displayProducts.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+                break;
+            case 'price-desc':
+                displayProducts.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+                break;
+            case 'name':
+            default:
+                displayProducts.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+                break;
+        }
+
+        grid.innerHTML = displayProducts.map(createProductCard).join('');
     }
 
     // Search functionality
@@ -400,6 +426,14 @@ async function initShopPage() {
             loadProducts();
         });
     });
+
+    // Sort functionality
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            currentSort = sortSelect.value;
+            loadProducts();
+        });
+    }
 
     loadProducts();
 }
@@ -675,7 +709,7 @@ function initContactPage() {
 // Update user nav display
 async function updateUserNav() {
     const userNav = document.getElementById('user-nav');
-    if (!userNav) return;
+    const mobileAuthLink = document.getElementById('mobile-auth-link');
 
     if (AUTH.isLoggedIn()) {
         const userData = await AUTH.getCurrentUser();
@@ -694,22 +728,44 @@ async function updateUserNav() {
             // Not admin or error, ignore
         }
 
-        if (userData && userData.success && userData.user) {
-            userNav.innerHTML = `
-        <span class="user-greeting">Hi, ${userData.user.name || userData.user.email}</span>
-        ${adminLink}
-        <button class="btn btn-outline btn-small" onclick="AUTH.logout()">Logout</button>
-      `;
-        } else {
-            userNav.innerHTML = `
-        ${adminLink}
-        <button class="btn btn-outline btn-small" onclick="AUTH.logout()">Logout</button>
-      `;
+        if (userNav) {
+            if (userData && userData.success && userData.user) {
+                userNav.innerHTML = `
+          <span class="user-greeting">Hi, ${userData.user.name || userData.user.email}</span>
+          ${adminLink}
+          <button class="btn btn-outline btn-small" onclick="AUTH.logout()">Logout</button>
+        `;
+            } else {
+                userNav.innerHTML = `
+          ${adminLink}
+          <button class="btn btn-outline btn-small" onclick="AUTH.logout()">Logout</button>
+        `;
+            }
+        }
+
+        // Update mobile auth link
+        if (mobileAuthLink) {
+            mobileAuthLink.textContent = 'Sign Out';
+            mobileAuthLink.href = '#';
+            mobileAuthLink.onclick = (e) => {
+                e.preventDefault();
+                closeMobileNav();
+                AUTH.logout();
+            };
         }
     } else {
-        userNav.innerHTML = `
-      <a href="auth.html" class="btn btn-outline btn-small">Sign In</a>
-    `;
+        if (userNav) {
+            userNav.innerHTML = `
+        <a href="auth.html" class="btn btn-outline btn-small">Sign In</a>
+      `;
+        }
+
+        // Update mobile auth link
+        if (mobileAuthLink) {
+            mobileAuthLink.textContent = 'Sign In';
+            mobileAuthLink.href = 'auth.html';
+            mobileAuthLink.onclick = () => closeMobileNav();
+        }
     }
 }
 

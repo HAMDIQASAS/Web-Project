@@ -52,7 +52,7 @@ function getProducts() {
                 image_url,
                 stock_quantity as stock
             FROM products
-            WHERE 1=1
+            WHERE (is_active = 1 OR is_active IS NULL)
         ";
 
         $params = [];
@@ -129,7 +129,7 @@ function getProduct() {
                 image_url,
                 stock_quantity as stock
             FROM products
-            WHERE id = ?
+            WHERE id = ? AND (is_active = 1 OR is_active IS NULL)
         ";
 
         $stmt = $pdo->prepare($sql);
@@ -161,7 +161,7 @@ function getCategories() {
     }
 
     try {
-        $stmt = $pdo->query("SELECT DISTINCT category as name FROM products ORDER BY category");
+        $stmt = $pdo->query("SELECT DISTINCT category as name FROM products WHERE (is_active = 1 OR is_active IS NULL) ORDER BY category");
         $categories = $stmt->fetchAll();
 
         jsonResponse(['success' => true, 'categories' => $categories]);

@@ -123,7 +123,7 @@ function getDashboard() {
 
     try {
         // Get counts
-        $products = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
+        $products = $pdo->query("SELECT COUNT(*) FROM products WHERE is_active = 1 OR is_active IS NULL")->fetchColumn();
         $orders = $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
         $users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
         $revenue = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status != 'cancelled'")->fetchColumn();
@@ -164,7 +164,7 @@ function getProducts() {
     }
 
     try {
-        $stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC");
+        $stmt = $pdo->query("SELECT * FROM products WHERE is_active = 1 OR is_active IS NULL ORDER BY id DESC");
         jsonResponse(['success' => true, 'products' => $stmt->fetchAll()]);
     } catch (PDOException $e) {
         jsonResponse(['success' => false, 'message' => 'Failed to load products'], 500);
@@ -279,7 +279,7 @@ function updateProduct() {
 }
 
 /**
- * Delete product
+ * Delete product (soft delete - sets is_active to 0)
  */
 function deleteProduct() {
     $id = intval($_GET['id'] ?? 0);
@@ -293,7 +293,11 @@ function deleteProduct() {
     }
 
     try {
-        $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
+        // Check if is_active column exists, if not create it
+        $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS is_active TINYINT(1) DEFAULT 1");
+
+        // Soft delete by setting is_active to 0
+        $stmt = $pdo->prepare("UPDATE products SET is_active = 0 WHERE id = ?");
         $stmt->execute([$id]);
 
         jsonResponse(['success' => true, 'message' => 'Product deleted']);
