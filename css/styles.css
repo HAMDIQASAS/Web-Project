@@ -236,6 +236,7 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 .btn-primary {
     background: var(--magenta);
     color: var(--text-light);
+
 }
 
 .btn-primary:hover {
@@ -283,13 +284,14 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     overflow: hidden;
 }
 
-.hero-bg {
+.hero-bg-image {
     position: absolute;
     inset: 0;
-    background:
-            radial-gradient(circle at 20% 50%, rgba(255, 0, 153, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 80% 50%, rgba(0, 255, 214, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 50% 80%, rgba(255, 213, 0, 0.1) 0%, transparent 50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.6;
 }
 
 .hero-content {
@@ -622,6 +624,10 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
+}
+
+.product-desc {
+    display: none;
 }
 
 .product-name {
@@ -994,6 +1000,51 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     color: var(--magenta);
     border-color: var(--magenta);
     box-shadow: var(--glow-magenta);
+}
+
+.cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-item-qty button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.cart-item-qty button:hover {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+.cart-item-qty span {
+    min-width: 2rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-total {
+    font-weight: 600;
+    color: var(--yellow);
+    min-width: 80px;
+    text-align: right;
 }
 
 .cart-empty {
